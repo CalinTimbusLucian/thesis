@@ -1,15 +1,6 @@
 import cv2
 import numpy as np
-#target = cv2.imread('image_to_detect_2.png')
-#target = cv2.imread('multiple_red.jpg')
-#target = cv2.imread('multiple_diff.jpg')
-#target = cv2.imread('multiple_diff_2.jpg')
-#target = cv2.imread('stop_sign.jpg')
-#Arata ca aici se mai intampla sa iti deseneze is o parte foarte mica de pixeli
-#target = cv2.imread('pietoni+stop.jpg')
 target = cv2.imread('semn_multiplu.jpg')
-#Asta nu merge intentionat pt ca scrie peste ea, demonstreaza la licenta ca daca ai noise nu merge bine
-#target = cv2.imread('TwoBlueSigns.jpg')
 target = cv2.resize(target,(700,800),interpolation=cv2.INTER_AREA)
 print(target.shape)
 target_hsv = cv2.cvtColor(target,cv2.COLOR_BGR2HSV)
@@ -241,66 +232,7 @@ def drawContours(target,contours):
    for i in range(0,len(contours)):
          hull = cv2.convexHull(contours[i],returnPoints = True)
          cv2.drawContours(target,[hull],-1,(0,255,0),2)
-   return
-###################### LOADING THE TEMPLATES ######################################
-
-
-#cv2.drawContours(circle_template,circle_contour,-1,(0,255,0),3)
-#cv2.imshow('Initial Circle Template Contoured',circle_template)
-#cv2.waitKey(0)
-
-#Triangle Template
-
-#cv2.drawContours(triangle_template,triangle_contour,-1,(0,255,0),3)
-#cv2.imshow('Initial Triangle Template Contoured',triangle_template)
-#cv2.waitKey(0)
-
-#Square Template
-
-#cv2.drawContours(square_template,square_contour,-1,(0,255,0),3)
-#cv2.imshow('Initial Square Template Contoured',square_template)
-#cv2.waitKey(0)
-
-#Hexagon Template
-
-#cv2.imshow('Initial Hexagon Template Contoured',hexagon_template)
-#cv2.waitKey(0)
-# cv2.drawContours(hexagon_template,hexagon_contour,-1,(0,255,0),3)
-
-#Oval Template
-#Big In Height
-
-#cv2.drawContours(oval_template,oval_height_contour,-1,(0,255,0),3)
-#cv2.imshow('Initial Oval Height Template Contoured',oval_template)
-#cv2.waitKey(0)
-#Oval Template
-#Big in Width
-
-
-
-######################## USING MASKS TO FIND THE ROI #####################################
-#Find masks for different colors
-#Convert white from RGB to white in HSV
-#To find the masks, [H-10, 100,100] and [H+10, 255, 255]
-#Not completely true, check stackoverflow for errors/problems
-
-#White Mask Image
-#white_RGB = np.uint8([[[255,255,255]]])
-#white_HSV = cv2.cvtColor(white_RGB,cv2.COLOR_BGR2HSV)
-#white_mask = cv2.inRange(target_hsv,np.array([100,100,200]),np.array([255,255,255]))
-#cv2.imshow('White Mask Image',white_mask)
-#cv2.waitKey(0)
-
-#Red Mask Image
-
-
-#Blue Mask Image
-
-#cv2.imshow('Blue Mask Image',blue_mask)
-#cv2.waitKey(0)
-
-#Apply morphological close
-    
+   return 
 
 import cv2
 import numpy as np
