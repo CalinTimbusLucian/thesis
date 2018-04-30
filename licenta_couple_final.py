@@ -1,373 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Feb 14 20:00:33 2018
-
-@author: Calin
-"""
-
-#CHAPTER 1
-import cv2
-import numpy as np
-input = cv2.imread('input.jpg')
-#cv2.imshow('Rabbits',input)
-print(input)
-print(input.shape)
-#Height
-print(input.shape[0])
-#Width
-print(input.shape[1])
-#BGR
-#B,G,R = input[0,0]
-#print (B, G, R)
-
-B, G, R = cv2.split(input)
-print(B.shape)
-#cv2.imshow("Red",R)
-#cv2.imshow("Green",G)
-#cv2.imshow("Blue",B)
-
-
-#Remake the original image
-#merged = cv2.merge([B,G,R])
-#cv2.imshow("Merged",merged)
-
-#merged = cv2.merge([B+100,G,R])
-#cv2.imshow("Merged Blue",merged)
-#cv2.waitKey()
-#cv2.destroyAllWindows()
-#Converting to HSV and displaying each channel separately
-#hsv_image = cv2.cvtColor(input,cv2.COLOR_BGR2HSV)
-#cv2.imshow('HSV Image',hsv_image)
-#cv2.imshow('Hue channel',hsv_image[:,:,0])
-#cv2.imshow('Saturation channel',hsv_image[:,:,1])
-#cv2.imshow('Value Channel',hsv_image[:,:,2])
-#cv2.waitKey()
-#cv2.destroyAllWindows()
-
-#Let's create a matrix of zeros
-# with dimensions of the image H x W
-"""
-zeros = np.zeros(input.shape[:2],dtype="uint8")
-cv2.imshow("Red",cv2.merge([zeros,zeros,R]))
-cv2.imshow("Green",cv2.merge([zeros,G,zeros]))
-cv2.imshow("Blue",cv2.merge([B,zeros,zeros]))
-cv2.waitKey()
-cv2.destroyAllWindows()
-"""
-
-"""
-cv2.imwrite('output.jpg',input)
-cv2.imwrite('output2.png',input)
-#Or read with imread('input.jpg',0)
-gray_image = cv2.cvtColor(input, cv2.COLOR_BGR2GRAY)
-cv2.imshow('Gray Image',gray_image)
-cv2.waitKey()
-cv2.destroyAllWindows()
-"""
-
-import cv2
-import numpy as np
-#We need to import matplotlib to create our histogram plots
-from matplotlib import pyplot as plt
-image = cv2.imread('input.jpg')
-historgram = cv2.calcHist([input],[0],None,[256],[0,256])
-#We plot a historgram, ravel() flattens our image array(takes a two-dimensional input array and makes a one-dimensional array out of it)
-plt.hist(input.ravel(),256,[0,256]);plt.show()
-
-#Viewing separate color channels
-color = ('r','g','b')
-for i,col in enumerate(color):
-        histogram2 = cv2.calcHist([input],[i],None,[256],[0,256])
-        plt.plot(histogram2, color = col)
-        plt.xlim([0,256])
-plt.show()
-
-#CHAPTER 2
-#Operations on images
-import cv2
-import numpy as np
-#Translation
-image = cv2.imread('input.jpg')
-#Store height and width of the image
-height,width = image.shape[:2]
-quarter_height,quarter_width = height/4, width/4
-#T is our translation matrix
-T = np.float32([[1,0,quarter_width],[0,1,quarter_height]])
-#We use warpAffine to transform the image using the matrix, T
-img_translation = cv2.warpAffine(image,T,(width,height))
-cv2.imshow('Translation',img_translation)
-cv2.waitKey()
-cv2.destroyAllWindows()
-
-#Rotations
-import cv2 
-import numpy as np
-image = cv2.imread('input.jpg')
-#Take the first two elements of the array
-height, width = image.shape[:2]
-#Divide by two to rotate the image around its centre
-rotation_matrix = cv2.getRotationMatrix2D((width/2,height/2),90,.75)
-rotated_image = cv2.warpAffine(image,rotation_matrix,(width,height))
-cv2.imshow('Rotated Image',rotated_image)
-cv2.waitKey()
-cv2.destroyAllWindows()
-
-#Re-sizing,Scaling and Interpolation
-#Interpolation = method of constructing new data points within
-#the range of a discrete set of known data points
-import cv2 
-import numpy as np
-image = cv2.imread('input.jpg')
-#Let's make the image 3/4 of its initial size
-image_scaled = cv2.resize(image,None,fx=0.75,fy=0.75)
-#Let's double the size of our image
-image_doubled = cv2.resize(image,None,fx=2,fy=2,interpolation=cv2.INTER_CUBIC)
-#Let's skew the resizing by setting the exact dimension
-img_scaled_2 = cv2.resize(image,(900,400),interpolation=cv2.INTER_AREA)
-cv2.imshow('Original image',image)
-cv2.imshow('Scaling-Linear Interpolation',image_scaled)
-cv2.imshow('Scaling-Cubic Interpolation',image_doubled)
-cv2.imshow('Image scaled 2',img_scaled_2)
-cv2.waitKey()
-cv2.destroyAllWindows()
-
-#Image Pyramids
-#Pyramiding image refers to either upscaling(enlarging) and downsampling
-#Scaling down reduces the height and width of the image by half
-#This comes in useful when making object detectors that scales images each time it looks for objects
-import cv2
-image = cv2.imread('input.jpg')
-smaller = cv2.pyrDown(image)
-larger = cv2.pyrUp(image)
-cv2.imshow('Smaller',smaller)
-cv2.imshow('Larger',larger)
-cv2.waitKey()
-cv2.destroyAllWindows()
-
-#Cropping images
-import cv2
-import numpy as np
-image = cv2.imread('input.jpg')
-height, width = image.shape[:2]
-#Let's get the starting pixel coordinates (top left of cropping rectangle)
-start_row,start_col = int(height * .25), int(width * .25)
-#Let's get the ending pixel coordinates(bottom right)
-end_row,end_col = int(height * .75), int(width* .75)
-#Simply use the indexing to crop out the rectangle we desire
-cropped = image[start_row:end_row,start_col:end_col]
-cv2.imshow('Original image',image)
-cv2.imshow('Cropped image',cropped)
-cv2.waitKey()
-cv2.destroyAllWindows()
-
-#Arithmetic operations
-import cv2
-import numpy as np
-image = cv2.imread('input.jpg')
-#Create a matrix of ones, then multiply it by a scaler of 100
-#This gives a matrix with same dimensions of our image with all values being 100
-M = np.ones(image.shape,dtype="uint8") * 75
-
-#We use this to add this matrix M to our image
-#Notice the increase in brightness
-added = cv2.add(image,M)
-cv2.imshow("Added",added)
-
-#Likewise we can also subtract
-#Notice the decrease in brightness
-subtracted = cv2.subtract(image,M)
-cv2.imshow("Subtracted",subtracted)
-cv2.waitKey()
-cv2.destroyAllWindows()
-
-#Bitwise operations and masking
-#uint8 datatype for storing images in OpenCV
-import cv2
-import numpy as np
-#Making a square
-#if we are doing a colored image we'd use rectangle = np.zeros((300,300,3),np.uint8)
-square = np.zeros((300,300),np.uint8)
-cv2.rectangle(square,(50,50),(250,250),255,-2)
-cv2.imshow("Square",square)
-
-#Making an ellipse
-ellipse = np.zeros((300,300),np.uint8)
-cv2.ellipse(ellipse,(150,150),(150,150),30,0,180,255,-1)
-cv2.imshow("Ellipse",ellipse)
-
-
-#Show only where they intersect
-And = cv2.bitwise_and(square,ellipse)
-cv2.imshow("AND",And)
-cv2.waitKey(0)
-
-
-#Show where either square or ellipse is
-bitwiseOr = cv2.bitwise_or(square,ellipse)
-cv2.imshow("OR",bitwiseOr)
-cv2.waitKey(0)
-
-#Shows where either exists by itself
-bitwiseXor = cv2.bitwise_xor(square,ellipse)
-cv2.imshow("XOR",bitwiseXor)
-cv2.waitKey(0)
-
-#Shows everything that isn't part of the square
-#Notice that this operation inverts the image totally
-bitwiseNot_sq = cv2.bitwise_not(square)
-cv2.imshow("NOT-SQUARE",bitwiseNot_sq)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-#Blur,Sharpening,Canny for edge detection etc etc
-
-
-#CHAPTER 3
-#Segmentation = Partitioning images into different regions
-#STEP 1 - Grayscaling essential when finding contours(cv2.findContours doesn't work if the image is colored)
-#STEP 2 - Find Canny Edges(not necessary, but it reduces a lot of noise in practice when finding contours )
-#     2.1 - cv2.findContours modifies the original image, so use .copy() method to copy the initial image into a temp variable
-#         - cv2.findContours returns the contours and the hierarchy
-#STEP 3 - drawContours(image,contours,nb_of_contours_to_draw(-1 if you draw thm all),(0,255,0)=color(green here),and last param = thickness of the contour)
-import cv2
-import numpy as np
-#Step 1.1 = Loading the image
-image = cv2.imread('image_to_detect_2.png')
-cv2.imshow('Original Image',image)
-cv2.waitKey(0)
-#Step 1.2 = Converting the image to grayscale
-gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-cv2.imshow('Grayscaled Image',gray)
-cv2.waitKey(0)
-#Step 1.3 = Bilateral filtering
-#Best for removing noise but still keeping the edges
-bilateral = cv2.bilateralFilter(gray,3,75,75)
-cv2.imshow('Bilateral Blurring',bilateral)
-cv2.waitKey(0)
-#Step 2.0 = Applying the Canny Edge Detection Algorithm
-#Find Canny Edges
-edged = cv2.Canny(bilateral,50,120)
-cv2.imshow("Canny Edges",edged)
-cv2.waitKey(0)
-#Step 2.1 = Finding contours, use a copy of your image since findContours alters the image
-_,contours, hierarchy = cv2.findContours(edged, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-print("Number of Contours found = " + str(len(contours)))
-cv2.imshow("Canny Edge After Contouring",edged)
-cv2.waitKey(0)
-#Step 3 - Sorting the contours
-sorted_contours = sorted(contours,key=cv2.contourArea,reverse=True)
-#Step 4 - Drawing the contours
-"""
-count = 0
-for c in sorted_contours:
-    cv2.drawContours(image,[c],-1,(0,255,0),2)
-    if(count >= 50):
-        break
-    count+=1
-"""
-#Drawing all contours
-cv2.drawContours(image,contours,-1,(0,255,0),1)
-cv2.imshow('Contours',image)
-
-
-#LICENTA - SOLUTION 1 --- STILL HAVE TO WORK ON IT
-#Step 5 - Load the template or reference image
-import cv2
-template = cv2.imread('Circle.PNG')
-target = cv2.imread('image_to_detect_2.png')
-target_grayscaled = cv2.cvtColor(target,cv2.COLOR_BGR2GRAY)
-circle_template_grayscaled = cv2.cvtColor(template,cv2.COLOR_BGR2GRAY)
-cv2.imshow('Template image',template)
-cv2.waitKey(0)
-cv2.imshow('Template image grayscaled',circle_template_grayscaled)
-cv2.waitKey(0)
-cv2.imshow('Initial Image',target)
-cv2.waitKey(0)
-cv2.imshow('Initial Image grayscaled',target_grayscaled)
-cv2.waitKey(0)
-
-
-
-ret,thresh1 = cv2.threshold(circle_template_grayscaled,127,255,0)
-ret,thresh2 = cv2.threshold(target_grayscaled,127,255,0)
-
-#edged_circle_template = cv2.Canny(circle_template_grayscaled,50,120)
-#cv2.imshow("Circle Template After Applying Canny Edges",edged_circle_template)
-#cv2.waitKey(0)
-
-
-#Finding contours in the template
-_,contours,hierarchy = cv2.findContours(thresh1,cv2.RETR_CCOMP,cv2.CHAIN_APPROX_NONE)
-
-#We need to sort the contours by area so that we can remove the largest
-#contour which is image outline
-sorted_contours = sorted(contours,key=cv2.contourArea,reverse=True)
-
-
-#We extract the second largest contour which will be our template contour
-template_contour = contours[1]
-
-#Draw the contour in the initial circle image
-cv2.drawContours(template,template_contour,-1,(0,255,0),3)
-cv2.imshow('Initial Circle Template Contoured',template)
-cv2.waitKey(0)
-
-
-#Finding contours in the target
-target_edged = cv2.Canny(target_grayscaled,50,120)
-cv2.imshow("Target Image after applying Canny Edge",target_edged)
-cv2.waitKey(0)
-
-
-#Extract the contours from the target image
-_,contours,hierarchy = cv2.findContours(target_edged,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
-print(len(contours))
-
-#Iterate through each contour in the target image
-#Use cv2.matchShapes to compare contour shapes
-#The smaller the better
-matches_list = []
-for c in contours:
-    match = cv2.matchShapes(template_contour,c,1,0.0)
-    matches_list.append(match)
-
-
-matched_contour = min(matches_list)
-contour_index = matches_list.index(matched_contour)
-
-
-print("Min value is:" , matched_contour)
-print("Min value position(in initial list) is:", contour_index)
-cv2.drawContours(target,contours,contour_index,(0,255,0),3)
-cv2.imshow('Output',target)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-
-
-
-
-#LICENTA  - SOLUTON 2
-import cv2
-import numpy as np
-#target = cv2.imread('image_to_detect_2.png')
-#target = cv2.imread('multiple_red.jpg')
-#target = cv2.imread('multiple_diff.jpg')
-#target = cv2.imread('multiple_diff_2.jpg')
-#target = cv2.imread('stop_sign.jpg')
-#Arata ca aici se mai intampla sa iti deseneze is o parte foarte mica de pixeli
-#target = cv2.imread('pietoni+stop.jpg')
-target = cv2.imread('semn_multiplu.jpg')
-#Asta nu merge intentionat pt ca scrie peste ea, demonstreaza la licenta ca daca ai noise nu merge bine
-#target = cv2.imread('TwoBlueSigns.jpg')
-target = cv2.resize(target,(700,800),interpolation=cv2.INTER_AREA)
-print(target.shape)
-target_hsv = cv2.cvtColor(target,cv2.COLOR_BGR2HSV)
-cv2.imshow('Initial Image',target)
-cv2.waitKey(0)
-cv2.imshow('HSV Image',target_hsv)
-cv2.waitKey(0)
-
 ###############################TEMPLATES AND CONTOURS###############################################
 #Circle Template&Contour
 def retrieveCircleContour():
@@ -488,18 +118,18 @@ def applyClosingAndRetrieveMasks(red_mask,blue_mask,yellow_mask,yellowish_browni
 #Display extractions
 #Bitwise-AND mask and original image
 def displayExtractions(target,red_mask,blue_mask,yellow_mask,yellowish_brownish_mask):
-   # red_extraction = cv2.bitwise_and(target,target, mask=red_mask)
-   # blue_extraction = cv2.bitwise_and(target,target, mask=blue_mask)
-   # yellow_extraction = cv2.bitwise_and(target,target, mask=yellow_mask)
-   # yellowish_brownish_extraction = cv2.bitwise_and(target,target,mask=yellowish_brownish_mask)
-   # cv2.imshow('Red Extraction',red_extraction)
-   # cv2.waitKey(0)
-   # cv2.imshow('Blue Extraction',blue_extraction)
-   # cv2.waitKey(0)
-   # cv2.imshow('Yellow Extraction',yellow_extraction)
-   # cv2.waitKey(0)
-   # cv2.imshow('Dark-Yellow-Brownish Extraction',yellowish_brownish_extraction)
-   # cv2.waitKey(0)
+    red_extraction = cv2.bitwise_and(target,target, mask=red_mask)
+    blue_extraction = cv2.bitwise_and(target,target, mask=blue_mask)
+    yellow_extraction = cv2.bitwise_and(target,target, mask=yellow_mask)
+    yellowish_brownish_extraction = cv2.bitwise_and(target,target,mask=yellowish_brownish_mask)
+    cv2.imshow('Red Extraction',red_extraction)
+    cv2.waitKey(0)
+    cv2.imshow('Blue Extraction',blue_extraction)
+    cv2.waitKey(0)
+    cv2.imshow('Yellow Extraction',yellow_extraction)
+    cv2.waitKey(0)
+    cv2.imshow('Dark-Yellow-Brownish Extraction',yellowish_brownish_extraction)
+    cv2.waitKey(0)
     return 
 
 def sortAndRetrieveRedAndBlueContours(red_mask,blue_mask):
@@ -658,8 +288,6 @@ def makeUniquePrediction(image_path):
         return max_index
 
 def drawContoursAndMakePrediction(target,contours,contour_type):
- #DE CE PLM NU FACE DIRECT PREDICTIA SI TREBUIE SA REINCARCE DE PE DISC WTF WTF WTF?
- #RAMANE BLOCAT PE PRIMA PREDICITIE SI NUMA LA AIA RAMANE N-ARE SENS WTF?PYTHON REFERENCE?
    for i in range(0,len(contours)):
          hull = cv2.convexHull(contours[i],returnPoints = True)
          x,y,w,h = cv2.boundingRect(hull)
@@ -722,7 +350,7 @@ initialTime = dt.datetime.now()
 target_hsv = cv2.cvtColor(target,cv2.COLOR_BGR2HSV)
 red_mask,blue_mask,yellow_mask,yellowish_brownish_mask = retrieveRedMask(target_hsv),retrieveBlueMask(target_hsv),retrieveYellowMask(target_hsv),retrieveYellowishBrownishMask(target_hsv)
 red_mask,blue_mask,yellow_mask,yellowish_brownish_mask = applyClosingAndRetrieveMasks(red_mask,blue_mask,yellow_mask,yellowish_brownish_mask)
-#displayExtractions(target,red_mask,blue_mask,yellow_mask,yellowish_brownish_mask)
+displayExtractions(target,red_mask,blue_mask,yellow_mask,yellowish_brownish_mask)
 sorted_red_contours,sorted_blue_contours = sortAndRetrieveRedAndBlueContours(red_mask.copy(),blue_mask.copy())
 sorted_yellow_contours,sorted_yellowish_brownish_contours = sortAndRetrieveYellowAndYellowishAndBrownishContours(yellow_mask.copy(),yellowish_brownish_mask.copy())
 red_contours_to_be_drawn = retrieveContoursToBeDrawn(sorted_red_contours,1,circle_contour,triangle_contour,square_contour,hexagon_contour,oval_contour)
@@ -746,35 +374,8 @@ cv2.destroyAllWindows()
 
 
 
-
-#NIGHT TIME ADAPTATION
-def adjust_gamma(image, gamma=1.0):
-	# build a lookup table mapping the pixel values [0, 255] to
-	# their adjusted gamma values
-	invGamma = 1.0 / gamma
-	table = np.array([((i / 255.0) ** invGamma) * 255
-		for i in np.arange(0, 256)]).astype("uint8")
-    
-	# apply gamma correction using the lookup table
-	return cv2.LUT(image, table)
-
-import cv2
-import numpy as np
-target = cv2.imread('noapte_3.jpg')
-target = cv2.resize(target,(700,800),interpolation=cv2.INTER_AREA)
-for gamma in np.arange(0.0, 3.5, 0.5):
-	# ignore when gamma is 1 (there will be no change to the image)
-	if gamma == 1:
-		continue
-	# apply gamma correction and show the images
-	gamma = gamma if gamma > 0 else 0.1
-	adjusted = adjust_gamma(target, gamma=gamma)
-	cv2.putText(adjusted, "g={}".format(gamma), (10, 30),cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 3)
-	cv2.imshow("Images", np.hstack([target, adjusted]))  
-	cv2.waitKey(0)
-
 #TEMPLATE MATCHING - CROSS CORRELATION
-#Doesn't work, demonstreaza
+#Doesn't work, prove
 """
 import cv2
 import numpy as np
