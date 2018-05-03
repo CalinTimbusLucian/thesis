@@ -255,21 +255,22 @@ def retrieveContoursToBeDrawn(contours,color_flag,circle_contour,triangle_contou
                 contours_to_be_drawn.append(c)
     return contours_to_be_drawn
 
-
 def retrieveYellowishContoursToBeDrawn(contours,color_flag,rhombus_contour):
     contours_to_be_drawn = []
-    may_be_yellowish_rhombus = False
-    may_be_yellowish_brownish_rhombus = False
     if(len(contours)>0):     
-      for (index,c) in enumerate(contours[:1]):
+      for (index,c) in enumerate(contours[:2]):
+         may_be_yellowish_rhombus = False
+         may_be_yellowish_brownish_rhombus = False     
          rhombus_match = cv2.matchShapes(rhombus_contour,c,1,0.0)
          if(rhombus_match < 0.4): 
              if(color_flag == 0): 
                  may_be_yellowish_rhombus = True
              else:
+                 print('Ii de desenat')
                  may_be_yellowish_brownish_rhombus = True
     if(may_be_yellowish_rhombus or may_be_yellowish_brownish_rhombus):
               contours_to_be_drawn.append(c)
+    print('Len of countours to be drawn is',len(contours_to_be_drawn))
     return contours_to_be_drawn
 
 
